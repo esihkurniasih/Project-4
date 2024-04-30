@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  db-mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  db-postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: data_warehouse
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+networks:
+  backend:
+
+docker exec -it <mysql_container_id> bash
+
+mysql --local-infile=1 -uroot -pmysql
+
+SET GLOBAL local_infile=1;
+
+python3 -m venv env
+
+source env/bin/activate
+pip install -r requirements.txt
+docker exec -it <postgres_container_id> bash
+psql -Upostgres
+create database data_warehouse;
+\c data_warehouse
+\d
